@@ -1,3 +1,4 @@
+# STEP 1/4 , DATA COLLECTING.
 import os
 import requests
 import pyarrow.parquet as pq
