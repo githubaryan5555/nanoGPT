@@ -1,4 +1,4 @@
-
+#STEP 2/4 TRAINING HUGGINGFACE UNIGRAM TOKENIZER (65536 VOCAB 2.9~~ GB DATA)
 import os
 import pyarrow.parquet as pq
 from tokenizers import Tokenizer, models, trainers, pre_tokenizers, normalizers
