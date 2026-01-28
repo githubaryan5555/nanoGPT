@@ -1,4 +1,5 @@
 # STEP 1/4 , DATA COLLECTING.
+# STEP 1/4 , DATA COLLECTING.
 import os
 import requests
 import pyarrow.parquet as pq
@@ -19,6 +20,11 @@ MOD_DIR  = os.path.join(BASE_DIR, "model_data")
 
 os.makedirs(TOK_DIR, exist_ok=True)
 os.makedirs(MOD_DIR, exist_ok=True)
+
+# Control variables
+DOWNLOAD_TOKENIZER = True   # set False to skip tokenizer shards
+DOWNLOAD_MODEL     = True   # set False to skip model shards
+INSPECT_PARQUETS   = True   # set False to skip printing first/last 100 sentences
 
 # =========================
 # STEP 1: DETECT REAL SHARDS
@@ -87,40 +93,52 @@ model_shards     = parquet_files[:NUM_MODEL_SHARDS]
 print(f"\n🧠 Tokenizer shards: {len(tokenizer_shards)}")
 print(f"🤖 Model shards: {len(model_shards)}")
 
-# overlap is allowed and expected
-download_shards(tokenizer_shards, TOK_DIR)
-download_shards(model_shards, MOD_DIR)
+if DOWNLOAD_TOKENIZER:
+    download_shards(tokenizer_shards, TOK_DIR)
+else:
+    print("⚠ Skipping tokenizer shard download")
+
+if DOWNLOAD_MODEL:
+    download_shards(model_shards, MOD_DIR)
+else:
+    print("⚠ Skipping model shard download")
 
 # =========================
 # STEP 4: INSPECT DATA
 # =========================
 
-def inspect_folder(folder, label):
+def inspect_folder(folder, label, print_text=True):
     print(f"\n===== {label.upper()} INSPECTION =====")
 
     files = sorted(os.listdir(folder))
-    all_text = []
+    if not files:
+        print("No files to inspect")
+        return
 
-    for f in files:
-        path = os.path.join(folder, f)
-        table = pq.read_table(path, columns=["text"])
-        texts = table.column("text").to_pylist()
-        all_text.extend(texts)
+    if print_text:
+        all_text = []
+        for f in files:
+            path = os.path.join(folder, f)
+            table = pq.read_table(path, columns=["text"])
+            texts = table.column("text").to_pylist()
+            all_text.extend(texts)
 
-    print("\n📌 FIRST 100 SENTENCES:")
-    for s in all_text[:100]:
-        print(s.replace("\n", " ")[:300])
+        print("\n📌 FIRST 100 SENTENCES:")
+        for s in all_text[:100]:
+            print(s.replace("\n", " ")[:300])
 
-    print("\n📌 LAST 100 SENTENCES:")
-    for s in all_text[-100:]:
-        print(s.replace("\n", " ")[:300])
+        print("\n📌 LAST 100 SENTENCES:")
+        for s in all_text[-100:]:
+            print(s.replace("\n", " ")[:300])
 
     print("\n📦 FILE SIZES:")
     for f in files:
         size_mb = os.path.getsize(os.path.join(folder, f)) / (1024 * 1024)
         print(f"{f}: {size_mb:.2f} MB")
 
-inspect_folder(TOK_DIR, "tokenizer")
-inspect_folder(MOD_DIR, "model")
+if DOWNLOAD_TOKENIZER:
+    inspect_folder(TOK_DIR, "tokenizer", print_text=INSPECT_PARQUETS)
+if DOWNLOAD_MODEL:
+    inspect_folder(MOD_DIR, "model", print_text=INSPECT_PARQUETS)
 
 print("\n🎉 DONE — OpenWebText2 shards downloaded and verified.")
