@@ -1,5 +1,5 @@
 out_dir = 'out-shakespeare-char'  
-eval_interval = 100  
+eval_interval = 5  # Changed from 100 to ensure evaluation occurs  
 eval_iters = 50  
 log_interval = 10  
   
@@ -32,6 +32,9 @@ weight_decay = 1e-1
 beta1 = 0.9  
 beta2 = 0.95  
 grad_clip = 1.0  
+  
+# Checkpointing - added this  
+always_save_checkpoint = True  # Force saving at each evaluation  
   
 # Single GPU settings  
 device = 'cuda'  
