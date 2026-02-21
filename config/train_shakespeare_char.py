@@ -1,10 +1,10 @@
-out_dir = 'out-shakespeare-char'  
+out_dir = 'out-shakespeare'  
 eval_interval = 5  # Changed from 100 to ensure evaluation occurs  
 eval_iters = 50  
 log_interval = 10  
   
 # Dataset settings - using shakespeare_char dataset  
-dataset = 'shakespeare_char'  
+dataset = 'shakespeare'  
   
 # Model architecture - 4 layers, 4096 context  
 n_layer = 4  
@@ -14,11 +14,11 @@ block_size = 4096
 dropout = 0.1  
   
 # Batch configuration  
-batch_size = 16  
+batch_size = 32
 gradient_accumulation_steps = 32  
   
 # Training duration  
-max_iters = 8  
+max_iters = 64
 lr_decay_iters = 8  
   
 # Learning rate  
